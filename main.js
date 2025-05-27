@@ -3,6 +3,8 @@ import { Entity } from "./gameComponent/entity.js";
 import { keys, initInput } from "./gameComponent/input.js";
 import { isColliding } from "./gameComponent/physics.js";
 
+window.addEventListener('DOMContentLoaded', loadSound);
+
 const canvas = document.getElementById("gameCanvas");
 
 const player = new Entity(100, 100, 30, "lime");
@@ -13,9 +15,13 @@ let dashReady = true;
 let dashStartTime = 0;
 let dashCooldown = 5000;
 let score = 0;
-let totalTime = 20;
+let totalTime = 60;
 let startTime = totalTime;
 let gameEnded = false;
+
+let pickupAudio;
+let dashAudio;
+let bgAudio;
 
 for (let i = 0; i < 5; i++) {
         placeItemNoOverlap();
@@ -35,6 +41,7 @@ player.update = () => {
             dashTrig = true;
             dashReady = false;
             dashStartTime = performance.now();
+            dashAudio.play();
 
             // To Restore speed back to 3
             setTimeout(() => {
@@ -57,11 +64,29 @@ player.update = () => {
     for (let i = items.length - 1; i >= 0; i--) {
         const item = items[i];
         if (isColliding(player, item)) {
+            pickupAudio.play();
             items.splice(i, 1);
             score++;
             placeItemNoOverlap();
         }
     }
+    const now = performance.now();
+    for (let i = items.length - 1; i >= 0; i--) {
+        const item = items[i];
+
+        if (now - item.spawnTime > 3000) { 
+            item.color = "orange";
+        }
+
+        if (now - item.spawnTime > 4200) { 
+            item.color = "gray";
+        }
+
+        if (now - item.spawnTime > 5000) { 
+                items.splice(i, 1);
+                placeItemNoOverlap();
+        }
+}
 };
 
 initInput();
@@ -77,6 +102,8 @@ const engine = new Engine(canvas, (dt) => {
 
     player.update(dt);
   }
+
+  else bgAudio.stop();
 }, (ctx) => {
     player.draw(ctx);
     items.forEach(item => item.draw(ctx));
@@ -123,10 +150,12 @@ function rndNum(min, max = null) {
 // Create new object at no overlap location
 function placeItemNoOverlap() {
   let x, y;
+  let newItem;
   do {
     x = rndNum(0, canvas.width - 20);
     y = rndNum(0, canvas.height - 20);
-    var newItem = new Entity(x, y, 20, "gold");
+    newItem = new Entity(x, y, 20, "gold");
+    newItem.spawnTime = performance.now(); 
   } while (items.some(item => isColliding(item, newItem)));
     items.push(newItem);
 }
@@ -134,17 +163,49 @@ function placeItemNoOverlap() {
 // Check wall collision
 function clampToCanvas(object) {
 
-  // Clamp X (horizontal)
+  // Horizontal
   if (object.x < 0) {
     object.x = 0;
   } else if (object.x + object.size > canvas.width) {
     object.x = canvas.width - object.size;
   }
 
-  // Clamp Y (vertical)
+  // Vertical
   if (object.y < 0) {
     object.y = 0;
   } else if (object.y + object.size > canvas.height) {
     object.y = canvas.height - object.size;
   }
+}
+
+// Audio
+function loadSound() {
+    pickupAudio = new Sound("./assets/audio/pickup.wav");
+    dashAudio = new Sound("./assets/audio/dash.wav");
+    bgAudio = new Sound("./assets/audio/bg.wav");
+
+    
+    document.addEventListener("keydown", () => {
+        bgAudio.play();
+    }, { once: true });
+}
+
+function Sound(src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.crossOrigin = "anonymous";
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.setAttribute("looping", "true");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.play = function () {
+        if (!this.sound.paused || !this.sound.currentTime) {
+            this.sound.load();
+        }
+        this.sound.play();
+    }
+    this.stop = function () {
+        this.sound.pause();
+    }
 }
