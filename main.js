@@ -15,8 +15,9 @@ let dashReady = true;
 let dashStartTime = 0;
 let dashCooldown = 5000;
 let score = 0;
-let totalTime = 60;
+let totalTime = 58;
 let startTime = totalTime;
+let gameStarted = false;
 let gameEnded = false;
 
 let pickupAudio;
@@ -93,18 +94,29 @@ initInput();
 
 //Game loop
 const engine = new Engine(canvas, (dt) => {
-  if (!gameEnded) {
+  if (!gameStarted || gameEnded) return;
     startTime -= dt;
     if (startTime <= 0) {
       startTime = 0;
       gameEnded = true;
     }
+    if (gameEnded){
+      bgAudio.stop();
+    }
 
     player.update(dt);
+  
+}, (ctx) => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  if (!gameStarted) {
+    ctx.fillStyle = "white";
+    ctx.font = "30px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("Click to Start", canvas.width / 2, canvas.height / 2);
+    return;
   }
 
-  else bgAudio.stop();
-}, (ctx) => {
     player.draw(ctx);
     items.forEach(item => item.draw(ctx));
 
@@ -113,6 +125,7 @@ const engine = new Engine(canvas, (dt) => {
 
     ctx.fillStyle = "white";
     ctx.font = "20px Arial";
+    ctx.textAlign = "start";
     ctx.fillText(`Score: ${score}`, 10, 25);
     ctx.fillText(`Time: ${timeLeft}s`, 10, 50); 
 
@@ -136,7 +149,14 @@ const engine = new Engine(canvas, (dt) => {
     }
 });
 
-engine.start();
+    engine.start();
+document.addEventListener("click", () => {
+  if (!gameStarted) {
+    bgAudio.play();
+    gameStarted = true;
+  }
+}, { once: true });
+
 
 // Random number generator
 function rndNum(min, max = null) {
@@ -162,7 +182,6 @@ function placeItemNoOverlap() {
 
 // Check wall collision
 function clampToCanvas(object) {
-
   // Horizontal
   if (object.x < 0) {
     object.x = 0;
@@ -183,11 +202,6 @@ function loadSound() {
     pickupAudio = new Sound("./assets/audio/pickup.wav");
     dashAudio = new Sound("./assets/audio/dash.wav");
     bgAudio = new Sound("./assets/audio/bg.wav");
-
-    
-    document.addEventListener("keydown", () => {
-        bgAudio.play();
-    }, { once: true });
 }
 
 function Sound(src) {
