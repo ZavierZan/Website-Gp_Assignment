@@ -1,13 +1,14 @@
 import { Engine } from "./gameComponent/engine.js";
-import { Entity } from "./gameComponent/entity.js";
+import { Entity, Item, AnimatedEntity, getFrames } from "./gameComponent/entity.js";
 import { keys, initInput } from "./gameComponent/input.js";
 import { isColliding } from "./gameComponent/physics.js";
+import { spriteSheet } from "./gameComponent/render.js";
 
 window.addEventListener('DOMContentLoaded', loadSound);
 
 const canvas = document.getElementById("gameCanvas");
 
-const player = new Entity(100, 100, 30, "lime");
+let player = new Entity(100, 100, 64, "lime");
 const items = [];
 let speed = 3;
 let dashTrig = false;
@@ -19,22 +20,74 @@ let totalTime = 58;
 let startTime = totalTime;
 let gameStarted = false;
 let gameEnded = false;
+let spriteImage;
+const frameMap = {
+  down: getFrames(4, 4),
+  left: getFrames(4, 2),
+  right: getFrames(4, 6),
+  up: getFrames(4, 8),
+  topLeft: getFrames(4, 1),
+  botLeft: getFrames(4, 3),
+  botRight: getFrames(4, 5),
+  topRight: getFrames(4, 7),
+};
+
 
 let pickupAudio;
 let dashAudio;
 let bgAudio;
 
+
+
 for (let i = 0; i < 5; i++) {
         placeItemNoOverlap();
     }
 
-player.update = () => {
+spriteSheet("./assets/playerSprite.png", (img) => {
+  spriteImage = img;
+  player = new AnimatedEntity(100, 100, 58, spriteImage, frameMap, [24 , 24], 0.1);
 
-    //Key Input
-    if (keys["a"]) player.x -= speed;
-    if (keys["d"]) player.x += speed;
-    if (keys["w"]) player.y -= speed;
-    if (keys["s"]) player.y += speed;
+  player.update = (dt) => {
+    let moved = false;
+
+    if (keys["a"]) {
+      player.x -= speed;
+      player.setDirection("left");
+      moved = true;
+    }
+    if (keys["d"]) {
+      player.x += speed;
+      player.setDirection("right");
+      moved = true;
+    }
+    if (keys["w"]) {
+      player.y -= speed;
+      player.setDirection("up");
+      moved = true;
+    }
+    if (keys["s"]) {
+      player.y += speed;
+      player.setDirection("down");
+      moved = true;
+    }
+    if (keys["w"] && keys["a"]) {
+      player.setDirection("topLeft");
+      moved = true;
+    }
+    if (keys["s"] && keys["a"]) {
+      player.setDirection("botLeft");
+      moved = true;
+    }
+    if (keys["s"] && keys["d"]) {
+      player.setDirection("botRight");
+      moved = true;
+    }
+    if (keys["w"] && keys["d"]) {
+      player.setDirection("topRight");
+      moved = true;
+    }
+
+    if (!moved) player.frameIndex = 0;
     
     if (keys["shift"] && dashReady) {
         if (!dashTrig) {
@@ -71,24 +124,20 @@ player.update = () => {
             placeItemNoOverlap();
         }
     }
-    const now = performance.now();
     for (let i = items.length - 1; i >= 0; i--) {
-        const item = items[i];
+      const item = items[i];
+      item.update(dt);
 
-        if (now - item.spawnTime > 3000) { 
-            item.color = "orange";
-        }
-
-        if (now - item.spawnTime > 4200) { 
-            item.color = "gray";
-        }
-
-        if (now - item.spawnTime > 5000) { 
-                items.splice(i, 1);
-                placeItemNoOverlap();
-        }
-}
+      if (item.state === "hidden") {
+          items.splice(i, 1);
+          placeItemNoOverlap();
+      }
+    }
 };
+
+  player.updateBase = player.update.bind(player);
+  player.updateBase(dt);
+});
 
 initInput();
 
@@ -174,8 +223,7 @@ function placeItemNoOverlap() {
   do {
     x = rndNum(0, canvas.width - 20);
     y = rndNum(0, canvas.height - 20);
-    newItem = new Entity(x, y, 20, "gold");
-    newItem.spawnTime = performance.now(); 
+    newItem = new Item(x, y);
   } while (items.some(item => isColliding(item, newItem)));
     items.push(newItem);
 }
@@ -201,6 +249,9 @@ function clampToCanvas(object) {
 function loadSound() {
     pickupAudio = new Sound("./assets/audio/pickup.wav");
     dashAudio = new Sound("./assets/audio/dash.wav");
+    
+    // Credit: Zane Little Music on opengameart.org.
+    // https://https://opengameart.org/content/apple-cider
     bgAudio = new Sound("./assets/audio/bg.wav");
 }
 
@@ -213,6 +264,8 @@ function Sound(src) {
     this.sound.setAttribute("looping", "true");
     this.sound.style.display = "none";
     document.body.appendChild(this.sound);
+
+    this.sound.volume = 0.3 // lower volume
     this.play = function () {
         if (!this.sound.paused || !this.sound.currentTime) {
             this.sound.load();

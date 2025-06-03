@@ -8,7 +8,7 @@ export function spriteSheet(sheet, onLoad){
     };
 
     characterSpriteSheet.onerror = () => {
-        console.error("❌ Failed to load image:", src);
+        console.error("Failed to load image:", src);
     };
   return characterSpriteSheet;
 }
