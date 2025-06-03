@@ -23,8 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // In a real app, this would filter areas based on capacity and dates
-        // For now, we'll just reload with the current filter values
+        // For now just reloads with the current filter values
         loadReservedAreas();
     });
     
@@ -168,7 +167,7 @@ function selectArea(event) {
     const areaBox = event.currentTarget;
     areaBox.classList.add('selected');
     
-    // In a real application, you would store the selected area for booking
+    // "store" the selected area for booking
     console.log('Selected area:', {
         id: areaBox.dataset.id,
         name: areaBox.dataset.name,
