@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<reserved_areas>
+    <area>
+        <id>1</id>
+        <name>Gazebo 1</name>
+        <cost>120.00</cost>
+        <booked>true</booked>
+        <capacity>8</capacity>
+        <image_path>Assets/gazebo1.jpg</image_path>
+        <description>A beautiful shaded gazebo near the main pool</description>
+    </area>
+    <area>
+        <id>2</id>
+        <name>Picnic Area A</name>
+        <cost>80.00</cost>
+        <booked>false</booked>
+        <capacity>12</capacity>
+        <image_path>Assets/picnic_a.jpg</image_path>
+        <description>Grassy area with picnic tables and shade</description>
+    </area>
+    <area>
+        <id>3</id>
+        <name>VIP Cabana</name>
+        <cost>200.00</cost>
+        <booked>true</booked>
+        <capacity>6</capacity>
+        <image_path>Assets/vip_cabana.jpg</image_path>
+        <description>Luxury cabana with premium amenities</description>
+    </area>
+    <area>
+        <id>4</id>
+        <name>Family Zone</name>
+        <cost>150.00</cost>
+        <booked>false</booked>
+        <capacity>15</capacity>
+        <image_path>Assets/family_zone.jpg</image_path>
+        <description>Large area perfect for family gatherings</description>
+    </area>
+    <area>
+        <id>5</id>
+        <name>Gazebo 2</name>
+        <cost>120.00</cost>
+        <booked>false</booked>
+        <capacity>8</capacity>
+        <image_path>Assets/gazebo2.jpg</image_path>
+        <description>Secluded gazebo with waterfall view</description>
+    </area>
+    <area>
+        <id>6</id>
+        <name>Poolside Lounge</name>
+        <cost>90.00</cost>
+        <booked>false</booked>
+        <capacity>10</capacity>
+        <image_path>Assets/poolside.jpg</image_path>
+        <description>Comfortable lounging area by the main pool</description>
+    </area>
+    <area>
+        <id>7</id>
+        <name>Executive Suite</name>
+        <cost>250.00</cost>
+        <booked>true</booked>
+        <capacity>4</capacity>
+        <image_path>Assets/executive.jpg</image_path>
+        <description>Premium private area with butler service</description>
+    </area>
+    <area>
+        <id>8</id>
+        <name>Picnic Area B</name>
+        <cost>80.00</cost>
+        <booked>false</booked>
+        <capacity>12</capacity>
+        <image_path>Assets/picnic_b.jpg</image_path>
+        <description>Shaded picnic area near the children's pool</description>
+    </area>
+    <area>
+        <id>9</id>
+        <name>Romantic Retreat</name>
+        <cost>180.00</cost>
+        <booked>false</booked>
+        <capacity>2</capacity>
+        <image_path>Assets/romantic.jpg</image_path>
+        <description>Private area perfect for couples</description>
+    </area>
+    <area>
+        <id>10</id>
+        <name>Group Zone</name>
+        <cost>160.00</cost>
+        <booked>false</booked>
+        <capacity>20</capacity>
+        <image_path>Assets/group_zone.jpg</image_path>
+        <description>Large open space for big groups and events</description>
+    </area>
+</reserved_areas>
