@@ -15,11 +15,18 @@ export class Entity {
 }
 
 export class Item extends Entity {
-    constructor(x, y, size = 20, color = "gold") {
-        let rnd = Math.random() * (200 - 50) + 50;
+    constructor(x, y, size = 20, color = "gold", sprite = null, spriteSrc = null, spriteSize = [32, 32]) {
+        let rnd = rndNum(50, 200);
 
         const dropStartY = y - rnd;
         super(x, dropStartY, size, color); 
+
+        this.sprite = sprite;
+        this.spriteSrc = spriteSrc;
+        this.spriteSize = spriteSize;
+        this.alpha = 1;
+        this.state = "visible";
+
         this.targetY = y;
         this.dropInitial = dropStartY;
         this.state = "dropping";
@@ -68,11 +75,16 @@ export class Item extends Entity {
     }
 
     draw(ctx) {
-        if (this.state === "hidden") return;
-
-        ctx.globalAlpha = this.alpha;
-        super.draw(ctx);
-        ctx.globalAlpha = 1;
+        if (this.sprite && this.spriteSrc) {
+      const [sx, sy] = this.spriteSrc;
+      const [sw, sh] = this.spriteSize;
+      ctx.drawImage(this.sprite, sx, sy, sw, sh, this.x, this.y, this.size, this.size);
+    } else {
+      ctx.fillStyle = this.color;
+      ctx.beginPath();
+      ctx.arc(this.x + this.size / 2, this.y + this.size / 2, this.size / 2, 0, Math.PI * 2);
+      ctx.fill()
+    }
     }
 }
 
@@ -83,6 +95,39 @@ function lerp(start, end, t) {
 function easeOut(t) {
   return 1 - Math.pow(1 - t, 3);
 }
+
+export class RoundItem extends Item {
+  constructor(x, y, size = 20) {
+    super(x, y, size, "red");
+    this.hue = Math.random() * 360; 
+  }
+
+  draw(ctx) {
+    if (this.state === "hidden") return;
+
+    // Animate hue shift
+    this.hue += 1;
+    if (this.hue > 360) this.hue = 0;
+
+    const x = this.x + this.size / 2;
+    const y = this.y + this.size / 2;
+    const radius = this.size / 2;
+
+    // Create radial gradient
+    const gradient = ctx.createRadialGradient(x, y, radius * 0.2, x, y, radius);
+    gradient.addColorStop(0, `hsl(${this.hue}, 100%, 70%)`);
+    gradient.addColorStop(1, `hsl(${(this.hue + 60) % 360}, 100%, 40%)`);
+
+    ctx.save();
+    ctx.globalAlpha = this.alpha;
+    ctx.fillStyle = this.color;
+    ctx.beginPath();
+    ctx.arc(this.x + this.size / 2, this.y + this.size / 2, this.size / 2, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
 
 export class AnimatedEntity extends Entity {
   constructor(x, y, size, sprite, frameMap, frameSize = [24, 24], frameSpeed = 0.1) {
@@ -131,4 +176,12 @@ export function getFrames(row, col, frameCount = 4, frameW = 24, frameH = 24, sk
     frames.push([offsetCol, y]);
   }
   return frames;
+}
+
+function rndNum(min, max = null) {
+  if (max === null) {
+    max = min;
+    min = 0;
+  }
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }

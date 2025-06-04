@@ -1,5 +1,5 @@
 import { Engine } from "./gameComponent/engine.js";
-import { Entity, Item, AnimatedEntity, getFrames } from "./gameComponent/entity.js";
+import { Entity, Item, RoundItem, AnimatedEntity, getFrames } from "./gameComponent/entity.js";
 import { keys, initInput } from "./gameComponent/input.js";
 import { isColliding } from "./gameComponent/physics.js";
 import { spriteSheet } from "./gameComponent/render.js";
@@ -21,23 +21,28 @@ let highScore = Number(localStorage.getItem("highScore")) || 0;
 let time = [60, 120, 180];
 let t = 0;
 let totalTime = 10;
-let startTime;
+let startTime = 2;
 let gameStarted = false;
 let gameEnded = false;
 
 
 let pickupAudio;
+let powerupAudio;
 let dashAudio;
 let bgAudio;
 let menuAudio;
 
 
 // Item
-for (let i = 0; i < 5; i++) {
+let itemSprite;
+spriteSheet("./assets/duck.png", (img) => {
+  itemSprite = img;
+});
+for (let i = 0; i <= 5; i++) {
   placeItemNoOverlap();
 }
 
-// Backgrounf tile
+// Background tile
 let tileImage;
 
 // Credit: Ivan Voirol on opengameart.org.
@@ -159,15 +164,29 @@ const frameMap = {
     
     //Collision
 
+let powerTimer = 0;
     for (let i = items.length - 1; i >= 0; i--) {
-        const item = items[i];
-        if (isColliding(player, item)) {
-            pickupAudio.play();
-            items.splice(i, 1);
-            score++;
-            placeItemNoOverlap();
-        }
+  const item = items[i];
+  if (isColliding(player, item)) {
+
+    if (item instanceof RoundItem) {
+      powerupAudio.play();
+      speed = 6;
+
+      if (powerTimer) clearTimeout(powerTimer);
+
+      powerTimer = setTimeout(() => {
+        speed = 3;
+        powerTimer = 0;
+      }, 2000);
     }
+
+    pickupAudio.play();
+    items.splice(i, 1);
+    score++;
+    placeItemNoOverlap();
+  }
+}
     for (let i = items.length - 1; i >= 0; i--) {
       const item = items[i];
       item.update(dt);
@@ -186,8 +205,6 @@ const frameMap = {
   const engine = new Engine(canvas, (dt) => {
 
     waterFrameTimer += dt * 1000;
-    console.log("loop:", currentWaterFrame);
-    console.log("dt:", dt);
 
     if (waterFrameTimer >= waterFrameSpeed) {
       waterFrameTimer = 0;
@@ -210,7 +227,7 @@ const frameMap = {
 
     player.update(dt);
 
-  }, (ctx) => {console.log("Frame:", currentWaterFrame);
+  }, (ctx) => {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -220,11 +237,17 @@ const frameMap = {
     menuAudio.play();
   }
 
+  // Start Menu
+  ctx.fillStyle = "#00000066";
+  ctx.fillRect( 0, 0, canvas.width, canvas.height, 60);
+
   ctx.fillStyle = "white";
   ctx.font = "30px Arial";
   ctx.textAlign = "center";
-  ctx.fillText("Press R to Start", canvas.width / 2, canvas.height / 2);
+  ctx.fillText("Press R to Start", canvas.width / 2, canvas.height / 2 - 30);
   ctx.fillText("Press T to Change Timer: " + totalTime, canvas.width / 2, canvas.height / 2 + 30);
+  ctx.fillText("Use WASD to Move", canvas.width / 2, canvas.height / 2);
+  ctx.fillText("Press Shift to Dash", canvas.width / 2, canvas.height / 2 + 60);
   return;
   }
 
@@ -262,6 +285,9 @@ const frameMap = {
 
   // End Menu
   if (gameEnded) {
+    ctx.fillStyle = "#00000066";
+    ctx.fillRect( 0, 0, canvas.width, canvas.height, 60);
+
     ctx.fillStyle = "white";
     ctx.font = "28px Arial";
     ctx.textAlign = "center";
@@ -311,12 +337,16 @@ function rndNum(min, max = null) {
 function placeItemNoOverlap() {
   let x, y;
   let newItem;
+
+  const spawnPower = rndNum(100) <= 20;
+
   do {
     x = rndNum(0, canvas.width - 20);
     y = rndNum(0, canvas.height - 20);
-    newItem = new Item(x, y);
+    newItem = spawnPower ? new RoundItem(x, y) : new Item(x, y, 32, null, itemSprite, [0,0], [16, 16]);
   } while (items.some(item => isColliding(item, newItem)));
-    items.push(newItem);
+
+  items.push(newItem);
 }
 
 // Check wall collision
@@ -340,6 +370,7 @@ function clampToCanvas(object) {
 function loadSound() {
     pickupAudio = new Sound("./assets/audio/pickup.wav");
     dashAudio = new Sound("./assets/audio/dash.wav");
+    powerupAudio = new Sound("./assets/audio/powerup.wav");
     
     // Credit: Zane Little Music on opengameart.org.
     // https://opengameart.org/content/apple-cider
