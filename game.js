@@ -21,7 +21,7 @@ let highScore = Number(localStorage.getItem("highScore")) || 0;
 let time = [120, 180, 60];
 let t = 0;
 let totalTime = 60;
-let startTime = 2;
+let startTime = totalTime;
 let gameStarted = false;
 let gameEnded = false;
 
@@ -340,7 +340,7 @@ function placeItemNoOverlap() {
   let x, y;
   let newItem;
 
-  const spawnPower = rndNum(100) <= 20;
+  const spawnPower = rndNum(100) <= 10;
 
   do {
     let rnd = rndNum(0, 2);
