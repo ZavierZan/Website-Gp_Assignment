@@ -1,139 +1,327 @@
-html{
+* {
     box-sizing: border-box;
-}
-
-*, *::before, *::after{
-    box-sizing: inherit;
-}
-
-body{
-    text-align: center;
     margin: 0;
+    padding: 0;
 }
 
-#gameCanvas {
-    margin: 50px;
-    border: #000000 solid 1px;
-    background-color: #1b1b1b;
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    color: #333;
 }
 
-html{
-    box-sizing: border-box;
+/* Navigation Bar */
+.navbar {
+    background-color: #0066cc;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+#parakailink {
+    color: white;
 }
 
-*, *::before, *::after{
-    box-sizing: inherit;
+.logo {
+    font-size: 24px;
+    font-weight: bold;
 }
 
-body{
-    
-    margin: 0;
+.logo img {
+    height: 40px;
+    vertical-align: middle;
+    margin-right: 10px;
 }
 
-.container{
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr 7fr 1fr;
-    grid-template-areas: 
-        "header"
-        "main"
-        "footer";
+.nav-links {
+    display: flex;
+    list-style: none;
 }
 
-#header {
-    grid-area: header;
+.nav-links li {
+    margin-left: 25px;
+    position: relative;
 }
 
-#banner {
-    grid-area: banner;
+.nav-links a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s;
 }
 
-#sidebar {
-    grid-area: sidebar;
+.nav-links a:hover {
+    color: #cce6ff;
 }
 
-#main {
-    grid-area: main;
+.dropdown {
+    position: relative;
+    display: inline-block;
 }
 
-#footer {
-    grid-area: footer;
-}
-
-
-/* Main */
-
-
-
-/* Main End */
-#header{
-    background-color: #000000;
-}
-
-#logo{
-    float: left; 
-    width: 20%; height: 100%;     
-}
-
-#logo img{
-    padding-left: 20px;
-    height: 9vh;
-}
-
-#footer{
-    background-color: #ceced7;
-    z-index: 1000;
-}
-
-#nav{
-    text-align: left;
-    position: relative; 
-    top: 30%;
-}
-
-
-/* For Dropdown */
-.drop{
+.dropdown-content {
     display: none;
-    background-color: #aaaaaa;
-    opacity: 0.85;
-    width: auto;
-    text-align: left;
+    position: absolute;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 4px;
+    right: 0;
 }
 
-.show {
+.dropdown-content a {
+    color: #333;
+    padding: 12px 16px;
+    text-decoration: none;
     display: block;
 }
 
-#drop1{
-    position: absolute;
-    left: 34%;
-    top: 150%;
-    z-index: 1;   
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+    color: #0066cc;
 }
 
-
-
-.drop ul{
-    list-style-type: none;
-    padding-left: 10px;
+.dropdown:hover .dropdown-content {
+    display: block;
 }
-/* Dropdown End */
 
-#nav a{
-    color: #FFFFFF; 
+.dropdown-btn::after {
+    content: "▼";
+    font-size: 10px;
+    margin-left: 5px;
+}
+
+/* Main Content */
+.booking-container {
+    max-width: 1000px;
+    margin: 30px auto;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.header {
+    background-color: #0066cc;
+    color: white;
+    padding: 20px;
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+.description {
+    border-right: 1px solid #eee;
+    padding-right: 20px;
+}
+
+.description h2 {
+    color: #0066cc;
+    margin-top: 0;
+    margin-bottom: 15px;
+}
+
+.booking-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.date-inputs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.date-group {
+    flex: 1;
+}
+
+.date-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #0066cc;
+}
+
+.date-group input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.capacity-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.capacity-group label {
+    font-weight: bold;
+    color: #0066cc;
+}
+
+.capacity-group input {
+    width: 60px;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.search-btn {
+    background-color: #0066cc;
+    color: white;
+    border: none;
     padding: 10px;
-    text-decoration: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
 }
 
-#nav a:link{
-    color: white; 
+.search-btn:hover {
+    background-color: #004d99;
 }
 
-#nav a:hover{
-    color: aqua;
+.payment-methods {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #666;
 }
 
-#nav a:active{
-    color: green;
+.area-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.area-box {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.area-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.area-box.booked {
+    background-color: #ffebee;
+    border-color: #f44336;
+    color: #f44336;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.area-box.selected {
+    background-color: #e3f2fd;
+    border: 2px solid #0066cc;
+    box-shadow: 0 0 15px rgba(76, 175, 80, 0.5);
+}
+
+.area-number {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.area-name {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.area-status {
+    font-size: 12px;
+    margin-bottom: 3px;
+}
+
+.area-capacity {
+    font-size: 11px;
+    color: #666;
+}
+
+.instructions {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+.instructions ol {
+    padding-left: 20px;
+}
+
+.instructions li {
+    margin-bottom: 8px;
+}
+
+/* Tooltip styles */
+.area-tooltip {
+    position: fixed;
+    background: white;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    max-width: 300px;
+    pointer-events: none;
+}
+
+.area-tooltip h3 {
+    margin-top: 0;
+    color: #2a6496;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.area-tooltip p {
+    margin: 5px 0;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.area-tooltip strong {
+    color: #0066cc;
+}
+
+.tooltip-image {
+    width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+}
+
+/* Footer */
+.footer {
+    background-color: #0066cc;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    margin-top: 30px;
+    font-size: 14px;
 }

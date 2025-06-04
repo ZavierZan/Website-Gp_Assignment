@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parakai Springs Booking</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="main.js" defer></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+           <a href="https://www.parakaisprings.co.nz/" id="parakailink"> <img src="Assets/ParakaiSprings_logo.jpg" alt="Parakai Springs Logo" >Parakai Springs</a>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="#">Game</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-btn">Designs</a>
+                <div class="dropdown-content">
+                    <a href="#">Wirefram</a>
+                    <a href="#">Storyboard</a>
+                    <a href="#">Extras</a>
+                </div>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="booking-container">
+        <div class="header">
+            <h1>Reserved Area Booking</h1>
+        </div>
+        <div class="content">
+            <div class="description">
+                <h2>Description of reserved areas at Parakai Springs</h2>
+                <div class="instructions">
+                    <p>Instructions for how to use the booking system. This could include:</p>
+                    <ol>
+                        <li>Set the Check in and Check Out dates</li>
+                        <li>Enter capacity required</li>
+                        <li>Click Search to see available areas</li>
+                        <li>Hover over areas to see details</li>
+                        <li>Select an available area</li>
+                        <li>Submit your booking</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="booking-form">
+                <div class="date-inputs">
+                    <div class="date-group">
+                        <label>Check In</label>
+                        <input type="date" id="checkin">
+                    </div>
+                    <div class="date-group">
+                        <label>Check Out</label>
+                        <input type="date" id="checkout">
+                    </div>
+                </div>
+                <div class="capacity-group">
+                    <label>Capacity</label>
+                    <input type="number" id="capacity" min="1" value="1">
+                </div>
+                <button class="search-btn" id="search-btn">Search</button>
+                <div class="area-grid" id="area-grid">
+                    <!-- Areas will be populated here -->
+                    <div class="area-box booked">
+                        <div class="area-number">1</div>
+                        <div class="area-status">Booked</div>
+                    </div>
+                    <div class="area-box">
+                        <div class="area-number">2</div>
+                        <div class="area-status">Available</div>
+                    </div>
+                    <div class="area-box booked">
+                        <div class="area-number">3</div>
+                        <div class="area-status">Booked</div>
+                    </div>
+                    <div class="area-box">
+                        <div class="area-number">4</div>
+                        <div class="area-status">Available</div>
+                    </div>
+                    <div class="area-box">
+                        <div class="area-number">5</div>
+                        <div class="area-status">Available</div>
+                    </div>
+                    <div class="area-box">
+                        <div class="area-number">6</div>
+                        <div class="area-status">Available</div>
+                    </div>
+                    <div class="area-box booked">
+                        <div class="area-number">7</div>
+                        <div class="area-status">Booked</div>
+                    </div>
+                    <div class="area-box">
+                        <div class="area-number">8</div>
+                        <div class="area-status">Available</div>
+                    </div>
+                    <div class="area-box">
+                        <div class="area-number">9</div>
+                        <div class="area-status">Available</div>
+                    </div>
+                    <div class="area-box">
+                        <div class="area-number">10</div>
+                        <div class="area-status">Available</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2023 Parakai Springs. All rights reserved.</p>
+    </footer>
+</body>
+</html>
