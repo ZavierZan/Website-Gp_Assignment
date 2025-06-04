@@ -8,86 +8,129 @@ window.addEventListener('DOMContentLoaded', loadSound);
 
 const canvas = document.getElementById("gameCanvas");
 
-let player = new Entity(100, 100, 64, "lime");
+let player = new Entity(100, 100, 64, "lime");    //player hitbox
 const items = [];
 let speed = 3;
 let dashTrig = false;
 let dashReady = true;
 let dashStartTime = 0;
 let dashCooldown = 5000;
+
 let score = 0;
-let totalTime = 58;
-let startTime = totalTime;
+let highScore = Number(localStorage.getItem("highScore")) || 0;
+let time = [60, 120, 180];
+let t = 0;
+let totalTime = 10;
+let startTime;
 let gameStarted = false;
 let gameEnded = false;
-let spriteImage;
-const frameMap = {
-  down: getFrames(4, 4),
-  left: getFrames(4, 2),
-  right: getFrames(4, 6),
-  up: getFrames(4, 8),
-  topLeft: getFrames(4, 1),
-  botLeft: getFrames(4, 3),
-  botRight: getFrames(4, 5),
-  topRight: getFrames(4, 7),
-};
 
 
 let pickupAudio;
 let dashAudio;
 let bgAudio;
+let menuAudio;
 
 
-
+// Item
 for (let i = 0; i < 5; i++) {
-        placeItemNoOverlap();
-    }
+  placeItemNoOverlap();
+}
 
-spriteSheet("./assets/playerSprite.png", (img) => {
+// Backgrounf tile
+let tileImage;
+
+// Credit: Ivan Voirol on opengameart.org.
+// https://opengameart.org/content/basic-map-32x32-by-ivan-voirol
+spriteSheet("./assets/tileSheet.png", (img) => {
+  tileImage = img;
+
+});
+const waterAnimFrames = [
+  [3 * 32, 21 * 32], // frame 1
+  [13 * 32, 21 * 32]  // frame 2
+];
+let currentWaterFrame = 0;
+let waterFrameTimer = 0;
+const waterFrameSpeed = 300;
+
+// Player sprite
+let spriteImage;
+let frameSpeed = 0.3;
+let frameSize = [24, 24];
+const frameMap = {
+  left: getFrames(4, 1),
+  down: getFrames(4, 3),
+  right: getFrames(4, 5),
+  up: getFrames(4, 7),
+  topLeft: getFrames(4, 0),
+  botLeft: getFrames(4, 2),
+  botRight: getFrames(4, 4),
+  topRight: getFrames(4, 6),
+  idle: getFrames(1, 3, 3, 16)
+};
+
+  // Credit: Chasersgaming on opengameart.org.
+  // https://opengameart.org/content/swimmer
+  spriteSheet("./assets/playerSprite.png", (img) => {
   spriteImage = img;
-  player = new AnimatedEntity(100, 100, 58, spriteImage, frameMap, [24 , 24], 0.1);
+  player = new AnimatedEntity(100, 100, 48, spriteImage, frameMap, frameSize, frameSpeed);    //sprite size
 
+  const originalUpdate = player.update.bind(player);
   player.update = (dt) => {
     let moved = false;
 
-    if (keys["a"]) {
-      player.x -= speed;
-      player.setDirection("left");
+    let dx = 0;
+    let dy = 0;
+
+    if (keys["a"]) dx -= 1;
+    if (keys["d"]) dx += 1;
+    if (keys["w"]) dy -= 1;
+    if (keys["s"]) dy += 1;
+
+    const length = Math.hypot(dx, dy);
+
+    if (length > 0) {
+      dx /= length;
+      dy /= length;
+
+      player.x += dx * speed;
+      player.y += dy * speed;
+      player.frameSize = [24, 24];
       moved = true;
     }
-    if (keys["d"]) {
-      player.x += speed;
-      player.setDirection("right");
-      moved = true;
-    }
-    if (keys["w"]) {
-      player.y -= speed;
+    if (dx === 0 && dy < 0) {
       player.setDirection("up");
-      moved = true;
     }
-    if (keys["s"]) {
-      player.y += speed;
+    else if (dx === 0 && dy > 0) {
       player.setDirection("down");
-      moved = true;
     }
-    if (keys["w"] && keys["a"]) {
+    else if (dx < 0 && dy === 0) {
+      player.setDirection("left");
+    }
+    else if (dx > 0 && dy === 0) {
+      player.setDirection("right");
+    }
+    else if (dx < 0 && dy < 0) {
       player.setDirection("topLeft");
-      moved = true;
     }
-    if (keys["s"] && keys["a"]) {
-      player.setDirection("botLeft");
-      moved = true;
-    }
-    if (keys["s"] && keys["d"]) {
-      player.setDirection("botRight");
-      moved = true;
-    }
-    if (keys["w"] && keys["d"]) {
+    else if (dx > 0 && dy < 0) {
       player.setDirection("topRight");
-      moved = true;
+    }
+    else if (dx < 0 && dy > 0) {
+      player.setDirection("botLeft");
+    }
+    else if (dx > 0 && dy > 0) {
+      player.setDirection("botRight");
+    }
+    if (dx === 0 && dy === 0) {
+      player.frameSize = [16, 24];
+      player.setDirection("idle");
     }
 
-    if (!moved) player.frameIndex = 0;
+    if (!moved && player.setDirection("idle")) {
+      player.frameIndex = 0;
+    }
     
     if (keys["shift"] && dashReady) {
         if (!dashTrig) {
@@ -112,6 +155,7 @@ spriteSheet("./assets/playerSprite.png", (img) => {
     //_______________________________//
 
     clampToCanvas(player);
+    originalUpdate(dt);
     
     //Collision
 
@@ -133,78 +177,125 @@ spriteSheet("./assets/playerSprite.png", (img) => {
           placeItemNoOverlap();
       }
     }
-};
+  };
+  });
 
-  player.updateBase = player.update.bind(player);
-  player.updateBase(dt);
-});
+  initInput();
 
-initInput();
+  //Game loop
+  const engine = new Engine(canvas, (dt) => {
 
-//Game loop
-const engine = new Engine(canvas, (dt) => {
-  if (!gameStarted || gameEnded) return;
+    waterFrameTimer += dt * 1000;
+    console.log("loop:", currentWaterFrame);
+    console.log("dt:", dt);
+
+    if (waterFrameTimer >= waterFrameSpeed) {
+      waterFrameTimer = 0;
+      currentWaterFrame = (currentWaterFrame + 1) % waterAnimFrames.length;
+    }
+
+    if (!gameStarted || gameEnded) return;    
     startTime -= dt;
     if (startTime <= 0) {
       startTime = 0;
       gameEnded = true;
     }
     if (gameEnded){
+      if (score > highScore) {
+        highScore = score;
+        localStorage.setItem("highScore", highScore);
+      }
       bgAudio.stop();
     }
 
     player.update(dt);
-  
-}, (ctx) => {
+
+  }, (ctx) => {console.log("Frame:", currentWaterFrame);
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  drawWaterBackground(ctx); 
   if (!gameStarted) {
-    ctx.fillStyle = "white";
-    ctx.font = "30px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("Click to Start", canvas.width / 2, canvas.height / 2);
-    return;
+  if (menuAudio.sound.paused) {
+    menuAudio.play();
   }
 
-    player.draw(ctx);
-    items.forEach(item => item.draw(ctx));
+  ctx.fillStyle = "white";
+  ctx.font = "30px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText("Press R to Start", canvas.width / 2, canvas.height / 2);
+  ctx.fillText("Press T to Change Timer: " + totalTime, canvas.width / 2, canvas.height / 2 + 30);
+  return;
+  }
 
-    // Draw score and timer
-    const timeLeft = Math.ceil(startTime);
+  player.draw(ctx);
+  items.forEach(item => item.draw(ctx));
 
-    ctx.fillStyle = "white";
-    ctx.font = "20px Arial";
-    ctx.textAlign = "start";
-    ctx.fillText(`Score: ${score}`, 10, 25);
-    ctx.fillText(`Time: ${timeLeft}s`, 10, 50); 
+  // Draw score and timer
+  const timeLeft = Math.ceil(startTime);
 
-    // Cooldown bar at top-right
-    const barWidth = 100;
-    const barHeight = 10;
-    const barX = canvas.width - barWidth - 10;
-    const barY = 10;
+  ctx.fillStyle = "white";
+  ctx.font = "20px Arial";
+  ctx.textAlign = "start";
+  ctx.fillText(`Score: ${score}`, 10, 25);
+  ctx.fillText(`Time: ${timeLeft}s`, 10, 50); 
 
-    ctx.fillStyle = "gray";
-    ctx.fillRect(barX, barY, barWidth, barHeight);
+  // Cooldown bar at top-right
+  const barWidth = 100;
+  const barHeight = 10;
+  const barX = canvas.width - barWidth - 10;
+  const barY = 10;
 
-    if (!dashReady) {
+  ctx.fillStyle = "gray";
+  ctx.fillRect(barX, barY, barWidth, barHeight);
+
+  if (!dashReady) {
     const elapsed = performance.now() - dashStartTime;
     const ratio = Math.min(elapsed / dashCooldown, 1);
     ctx.fillStyle = "cyan";
     ctx.fillRect(barX, barY, barWidth * ratio, barHeight);
-    } else {
+  } 
+  else {
     ctx.fillStyle = "lime";
     ctx.fillRect(barX, barY, barWidth, barHeight);
-    }
+  }
+
+  // End Menu
+  if (gameEnded) {
+    ctx.fillStyle = "white";
+    ctx.font = "28px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(`Game Over`, canvas.width / 2, canvas.height / 2 - 30);
+    ctx.fillText(`Your Score: ${score}`, canvas.width / 2, canvas.height / 2);
+    ctx.fillText(`High Score: ${highScore}`, canvas.width / 2, canvas.height / 2 + 30);
+    ctx.fillText("Press R to Return to Start", canvas.width / 2, canvas.height / 2 + 60);
+    return;
+  }
+
 });
 
     engine.start();
-document.addEventListener("click", () => {
-  if (!gameStarted) {
+    document.addEventListener("keydown", (e) => {
+  if (!gameStarted && e.code === "KeyR") {
+    menuAudio.stop();
     bgAudio.play();
     gameStarted = true;
   }
-}, { once: true });
+  if (!gameStarted && e.code === "KeyT") {
+    totalTime = time[t];
+    t++
+    if (t >= time.length){
+      t = 0;
+    }
+    startTime = totalTime;
+  }
+  });
+
+  window.addEventListener("keydown", (e) => {
+  if (gameEnded && e.code === "KeyR") {
+    restartGame();
+  }
+  });
 
 
 // Random number generator
@@ -251,8 +342,11 @@ function loadSound() {
     dashAudio = new Sound("./assets/audio/dash.wav");
     
     // Credit: Zane Little Music on opengameart.org.
-    // https://https://opengameart.org/content/apple-cider
+    // https://opengameart.org/content/apple-cider
     bgAudio = new Sound("./assets/audio/bg.wav");
+    bgAudio.sound.volume = 0.3;
+    menuAudio = new Sound("./assets/audio/menu.mp3");
+    menuAudio.sound.volume = 0.1;
 }
 
 function Sound(src) {
@@ -265,7 +359,6 @@ function Sound(src) {
     this.sound.style.display = "none";
     document.body.appendChild(this.sound);
 
-    this.sound.volume = 0.3 // lower volume
     this.play = function () {
         if (!this.sound.paused || !this.sound.currentTime) {
             this.sound.load();
@@ -275,4 +368,42 @@ function Sound(src) {
     this.stop = function () {
         this.sound.pause();
     }
+}
+
+function restartGame() {
+  // Reset game state
+  score = 0;
+  startTime = totalTime;
+  gameEnded = false;
+  gameStarted = false;
+
+  // Reset player position
+  player.x = 100;
+  player.y = 100;
+
+  // Reset dash
+  dashReady = true;
+  dashTrig = false;
+  speed = 3;
+
+  // Reset items
+  items.length = 0;
+  for (let i = 0; i < 5; i++) {
+    placeItemNoOverlap();
+  }
+
+  // Reset animation
+  player.frameIndex = 0;
+  player.setDirection("idle");
+}
+
+function drawWaterBackground(ctx) {
+  if (!tileImage) return;
+  const [sx, sy] = waterAnimFrames[currentWaterFrame];
+
+  for (let y = 0; y < canvas.height; y += 32) {
+    for (let x = 0; x < canvas.width; x += 32) {
+      ctx.drawImage(tileImage, sx, sy, 32, 32, x, y, 64, 64);
+    }
+  }
 }

@@ -99,15 +99,6 @@ export class AnimatedEntity extends Entity {
   setDirection(dir) {
     if (this.direction !== dir) {
       this.direction = dir;
-      const colMap = {
-        "up": 9,
-        "down": 5,
-        "left": 3,
-        "right": 7
-      };
-      const col = colMap[dir] ?? 3;
-      this.frames = getFrames(8, col); 
-      this.frameIndex = 0;
     }
   }
 
@@ -115,26 +106,29 @@ export class AnimatedEntity extends Entity {
     this.frameTimer += dt;
     if (this.frameTimer >= this.frameSpeed) {
       this.frameTimer = 0;
-      const frames = this.frameMap[this.direction];
+      const frames = this.frameMap[this.direction];  
       this.frameIndex = (this.frameIndex + 1) % frames.length;
     }
   }
 
   draw(ctx) {
-    if (!this.sprite || !this.frameMap[this.direction]) return;
-    const [sx, sy] = this.frameMap[this.direction][this.frameIndex];
-    const [sw, sh] = this.frameSize;
+      const frames = this.frameMap[this.direction];
+      if (!this.sprite || !frames || !frames[this.frameIndex]) return;
+
+      const [sx, sy] = frames[this.frameIndex];
+      const [sw, sh] = this.frameSize;
 
     ctx.drawImage(this.sprite, sx, sy, sw, sh, this.x, this.y, this.size, this.size);
   }
 }
 
 
-export function getFrames(row, col, frameW = 24, frameH = 24) {
+export function getFrames(row, col, frameCount = 4, frameW = 24, frameH = 24, skipPx = 24) {
   const frames = [];
-  console.log(row + " - " + col)
-  for (let i = 0; i < col; i++) {
-    frames.push([col * frameW, row * frameH]);
+  const offsetCol = col * frameW + skipPx;
+  for (let i = 0; i < frameCount; i++) {
+    const y = (row + i) * frameH;
+    frames.push([offsetCol, y]);
   }
   return frames;
 }
