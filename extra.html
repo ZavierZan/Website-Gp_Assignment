@@ -4,12 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    
     <link rel="stylesheet" href="style.css">
+    <style>
+        body{
+            background-image: url(assets/Ducks_Drowning.gif);
+        }
+        .footer{
+            margin-top: 50%;
+        }
+    </style>
 </head>
 <body>
-
-    <!-- Navigation Bar -->
+        <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="logo">
            <a href="https://www.parakaisprings.co.nz/" id="parakailink"> <img src="Assets/ParakaiSprings_logo.jpg" alt="Parakai Springs Logo" >Parakai Springs</a>
@@ -22,27 +28,15 @@
                 <div class="dropdown-content">
                     <a href="assets/map-wireframe-storyboard.drawio.pdf">Wireframe</a>
                     <a href="assets/StoryboardGame.drawio.pdf">Storyboard</a>
-                    <a href="#">Extras</a>
+                    <a href="extra.html">Extras</a>
                 </div>
             </li>
         </ul>
     </nav>
-
-       
-
-        <div id = "main">
-            
-            <canvas id="gameCanvas" width="800" height="600"></canvas>
-        </div>
-
-
-        <div id = "footer"></div>
-    </div>
 
     <!-- Footer -->
     <footer class="footer">
         <p>&copy; 2023 Parakai Springs. All rights reserved.</p>
     </footer>
 </body>
-    <script src="game.js" type="module"></script> 
 </html>
