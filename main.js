@@ -57,8 +57,21 @@ function loadReservedAreas() {
         .then(str => (new window.DOMParser()).parseFromString(str, "text/xml"))
         .then(xml => {
             const areas = xml.querySelectorAll('area');
-            const areaGrid = document.getElementById('area-grid');
-            areaGrid.innerHTML = ''; // Clear existing content
+            const mapContainer = document.getElementById('map-container');
+            mapContainer.querySelectorAll('.area-box').forEach(box => box.remove());
+            const areaPositions = {
+                1: { top: "30%", left: "20%" },
+                2: { top: "45%", left: "70%" },
+                3: { top: "35%", left: "40%" },
+                4: { top: "25%", left: "60%" },
+                5: { top: "30%", left: "85%" },
+                6: { top: "55%", left: "85%" },
+                7: { top: "62%", left: "57%" },
+                8: { top: "70%", left: "10%" },
+                9: { top: "75%", left: "30%" },
+                10: { top: "10%", left: "20%" }
+            };
+
             
             const capacityFilter = parseInt(document.getElementById('capacity').value) || 1;
             
@@ -83,6 +96,14 @@ function loadReservedAreas() {
                 areaBox.dataset.capacity = capacity;
                 areaBox.dataset.description = description;
                 areaBox.dataset.image = imagePath;
+
+                const pos = areaPositions[areaId];
+                if (pos) {
+                    areaBox.style.position = 'absolute';
+                    areaBox.style.top = pos.top;
+                    areaBox.style.left = pos.left;
+                }
+
                 
                 // Add area number
                 const areaNumber = document.createElement('div');
@@ -102,11 +123,6 @@ function loadReservedAreas() {
                 areaStatus.textContent = booked ? 'Booked' : 'Available';
                 areaBox.appendChild(areaStatus);
                 
-                // Add capacity info
-                const areaCapacity = document.createElement('div');
-                areaCapacity.className = 'area-capacity';
-                areaCapacity.textContent = `${capacity} people`;
-                areaBox.appendChild(areaCapacity);
                 
                 // Add mouseover event for tooltip
                 areaBox.addEventListener('mouseover', showAreaTooltip);
@@ -117,7 +133,7 @@ function loadReservedAreas() {
                     areaBox.addEventListener('click', selectArea);
                 }
                 
-                areaGrid.appendChild(areaBox);
+                mapContainer.appendChild(areaBox);
             });
         })
         .catch(error => {

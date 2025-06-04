@@ -23,7 +23,7 @@
         <name>VIP Cabana</name>
         <cost>200.00</cost>
         <booked>true</booked>
-        <capacity>6</capacity>
+        <capacity>22</capacity>
         <image_path>Assets/vip_cabana.jpg</image_path>
         <description>Luxury cabana with premium amenities</description>
     </area>
@@ -41,7 +41,7 @@
         <name>Gazebo 2</name>
         <cost>120.00</cost>
         <booked>false</booked>
-        <capacity>8</capacity>
+        <capacity>69</capacity>
         <image_path>Assets/gazebo2.jpg</image_path>
         <description>Secluded gazebo with waterfall view</description>
     </area>
@@ -59,7 +59,7 @@
         <name>Executive Suite</name>
         <cost>250.00</cost>
         <booked>true</booked>
-        <capacity>4</capacity>
+        <capacity>30</capacity>
         <image_path>Assets/executive.jpg</image_path>
         <description>Premium private area with butler service</description>
     </area>
@@ -77,7 +77,7 @@
         <name>Romantic Retreat</name>
         <cost>180.00</cost>
         <booked>false</booked>
-        <capacity>2</capacity>
+        <capacity>7</capacity>
         <image_path>Assets/romantic.jpg</image_path>
         <description>Private area perfect for couples</description>
     </area>
