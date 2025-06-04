@@ -21,7 +21,7 @@ let highScore = Number(localStorage.getItem("highScore")) || 0;
 let time = [120, 180, 60];
 let t = 0;
 let totalTime = 60;
-let startTime = totalTime;
+let startTime = 2;
 let gameStarted = false;
 let gameEnded = false;
 
@@ -31,6 +31,7 @@ let powerupAudio;
 let dashAudio;
 let bgAudio;
 let menuAudio;
+let gameoverAudio;
 
 
 // Item
@@ -223,6 +224,7 @@ let powerTimer = 0;
         localStorage.setItem("highScore", highScore);
       }
       bgAudio.stop();
+      gameoverAudio.play();
     }
 
     player.update(dt);
@@ -377,8 +379,17 @@ function loadSound() {
     // https://opengameart.org/content/apple-cider
     bgAudio = new Sound("./assets/audio/bg.wav");
     bgAudio.sound.volume = 0.3;
+
+    // Credit: 8-Bit Arcade - Topic on youtube.com.
+    // https://www.youtube.com/watch?v=U_fVfbM_g40&list=PLIWWnehwK4nmmtYdfpPzs0tW4ajPXOuav&index=17
     menuAudio = new Sound("./assets/audio/menu.mp3");
     menuAudio.sound.volume = 0.1;
+    
+    // Credit: Guitarsey on youtube.com.
+    // https://www.youtube.com/watch?v=p4c7BDCQeuU
+    gameoverAudio = new Sound("./assets/audio/gameover.mp3");
+    gameoverAudio.sound.volume = 0.7;
+
 }
 
 function Sound(src) {
@@ -408,6 +419,7 @@ function restartGame() {
   startTime = totalTime;
   gameEnded = false;
   gameStarted = false;
+  gameoverAudio.stop();
 
   // Reset player position
   player.x = 100;
