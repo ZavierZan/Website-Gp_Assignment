@@ -18,10 +18,10 @@ let dashCooldown = 5000;
 
 let score = 0;
 let highScore = Number(localStorage.getItem("highScore")) || 0;
-let time = [60, 120, 180];
+let time = [120, 180, 60];
 let t = 0;
-let totalTime = 10;
-let startTime = 2;
+let totalTime = 60;
+let startTime = totalTime;
 let gameStarted = false;
 let gameEnded = false;
 
@@ -341,9 +341,10 @@ function placeItemNoOverlap() {
   const spawnPower = rndNum(100) <= 20;
 
   do {
+    let rnd = rndNum(0, 2);
     x = rndNum(0, canvas.width - 20);
     y = rndNum(0, canvas.height - 20);
-    newItem = spawnPower ? new RoundItem(x, y) : new Item(x, y, 32, null, itemSprite, [0,0], [16, 16]);
+    newItem = spawnPower ? new RoundItem(x, y) : new Item(x, y, 32, null, itemSprite, [rnd * 16,0], [16, 16]);
   } while (items.some(item => isColliding(item, newItem)));
 
   items.push(newItem);
