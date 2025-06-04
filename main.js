@@ -126,9 +126,12 @@ function loadReservedAreas() {
         });
 }
 
+let areaBox;
+let tooltip;
+
 function showAreaTooltip(event) {
-    const areaBox = event.currentTarget;
-    const tooltip = document.createElement('div');
+    areaBox = event.currentTarget;
+    tooltip = document.createElement('div');
     tooltip.className = 'area-tooltip';
     
     tooltip.innerHTML = `
@@ -143,17 +146,18 @@ function showAreaTooltip(event) {
     // Position the tooltip near the mouse
     tooltip.style.position = 'absolute';
     tooltip.style.left = `${event.clientX + 10}px`;
-    tooltip.style.top = `${event.clientY + 10}px`;
+    tooltip.style.top = `${event.clientY - 300}px`;
     
     document.body.appendChild(tooltip);
-    areaBox.dataset.tooltip = tooltip;
+    areaBox._tooltip = tooltip;
 }
 
 function hideAreaTooltip(event) {
-    const areaBox = event.currentTarget;
-    if (areaBox.dataset.tooltip) {
-        document.body.removeChild(areaBox.dataset.tooltip);
-        delete areaBox.dataset.tooltip;
+    areaBox = event.currentTarget;
+    tooltipId = areaBox._tooltip;
+     if (tooltipId) {
+        document.body.removeChild(tooltipId);
+        delete areaBox._tooltip;
     }
 }
 
