@@ -35,6 +35,8 @@ export class Item extends Entity {
         this.stayTime = 3;
         this.fadeTime = 2;
         this.alpha = 1;
+        this.currentSize = size;
+
 
         this.dropDelta = 0;
         this.stayDelta = 0;
@@ -66,7 +68,10 @@ export class Item extends Entity {
             case "fade":
                 this.fadeDelta += dt;
                 let fadeProgress = this.fadeDelta / this.fadeTime;
+                fadeProgress = Math.min(fadeProgress, 1);
                 this.alpha = 1 - fadeProgress;
+                
+                this.currentSize = this.size * (1 - 0.5 * fadeProgress);
                 if (fadeProgress >= 1) {
                     this.state = "hidden";
                 }
@@ -78,7 +83,12 @@ export class Item extends Entity {
         if (this.sprite && this.spriteSrc) {
       const [sx, sy] = this.spriteSrc;
       const [sw, sh] = this.spriteSize;
-      ctx.drawImage(this.sprite, sx, sy, sw, sh, this.x, this.y, this.size, this.size);
+      const drawSize = this.state === "fade" ? this.currentSize : this.size;
+      const drawX = this.x + (this.size - drawSize) / 2;
+      const drawY = this.y + (this.size - drawSize) / 2;
+
+      ctx.drawImage(this.sprite, sx, sy, sw, sh, drawX, drawY, drawSize, drawSize);
+
     } else {
       ctx.fillStyle = this.color;
       ctx.beginPath();
@@ -103,29 +113,30 @@ export class RoundItem extends Item {
   }
 
   draw(ctx) {
-    if (this.state === "hidden") return;
+  if (this.state === "hidden") return;
 
-    // Animate hue shift
-    this.hue += 1;
-    if (this.hue > 360) this.hue = 0;
+  // Animate hue shift continuously
+  this.hue = (this.hue + 1) % 360;
 
-    const x = this.x + this.size / 2;
-    const y = this.y + this.size / 2;
-    const radius = this.size / 2;
+  const x = this.x + this.size / 2;
+  const y = this.y + this.size / 2;
+  const radius = this.size / 2;
 
-    // Create radial gradient
-    const gradient = ctx.createRadialGradient(x, y, radius * 0.2, x, y, radius);
-    gradient.addColorStop(0, `hsl(${this.hue}, 100%, 70%)`);
-    gradient.addColorStop(1, `hsl(${(this.hue + 60) % 360}, 100%, 40%)`);
+  // Gradient color shift
+  const gradient = ctx.createRadialGradient(x, y, radius * 0.2, x, y, radius);
+  gradient.addColorStop(0, `hsl(${this.hue}, 100%, 70%)`);
+  gradient.addColorStop(1, `hsl(${(this.hue + 60) % 360}, 100%, 40%)`);
 
-    ctx.save();
-    ctx.globalAlpha = this.alpha;
-    ctx.fillStyle = this.color;
-    ctx.beginPath();
-    ctx.arc(this.x + this.size / 2, this.y + this.size / 2, this.size / 2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.restore();
-  }
+  ctx.save();
+  ctx.globalAlpha = this.alpha;
+  ctx.fillStyle = gradient;
+  ctx.beginPath();
+  ctx.arc(x, y, radius, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+}
+
+  
 }
 
 
